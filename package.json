@@ -59,6 +59,11 @@
     "test": "jest"
   },
   "private": true,
+  "overrides": {
+    "typescript": "$typescript",
+    "@emnapi/core": "1.11.3",
+    "@emnapi/runtime": "1.11.3"
+  },
   "jest": {
     "preset": "jest-expo"
   }
