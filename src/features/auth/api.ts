@@ -1,5 +1,6 @@
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
+import { Platform } from 'react-native';
 
 import { supabase } from '@/lib/supabase';
 
@@ -16,6 +17,21 @@ export async function signInWithEmail(email: string) {
 
 export async function signInWithGoogle() {
   const redirectTo = Linking.createURL('auth-callback');
+
+  if (Platform.OS === 'web') {
+    // Full-page redirect: Google's login page sends a Cross-Origin-Opener-Policy
+    // header that severs a popup's connection back to the window that opened it,
+    // which breaks the WebBrowser popup + postMessage relay used below on native.
+    // A same-window redirect sidesteps that entirely and lands back on
+    // (auth)/auth-callback.tsx, which does the actual code exchange.
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo },
+    });
+    if (error) throw error;
+    return;
+  }
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo, skipBrowserRedirect: true },
