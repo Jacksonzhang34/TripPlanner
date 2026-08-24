@@ -47,3 +47,6 @@ example
 # generated native folders
 /ios
 /android
+
+# planning/design docs (not part of the shipped project)
+/docs
