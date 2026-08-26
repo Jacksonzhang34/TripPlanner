@@ -1,27 +1,4 @@
-import { generateInviteCode, isValidInviteCodeFormat } from './invite-code';
-
-describe('generateInviteCode', () => {
-  it('generates an 8-character code', () => {
-    expect(generateInviteCode()).toHaveLength(8);
-  });
-
-  it('only uses unambiguous uppercase letters and digits', () => {
-    const code = generateInviteCode();
-    expect(code).toMatch(/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]+$/);
-  });
-
-  it('excludes visually ambiguous characters', () => {
-    for (let i = 0; i < 50; i++) {
-      const code = generateInviteCode();
-      expect(code).not.toMatch(/[0O1IL]/);
-    }
-  });
-
-  it('generates different codes across calls', () => {
-    const codes = new Set(Array.from({ length: 20 }, () => generateInviteCode()));
-    expect(codes.size).toBe(20);
-  });
-});
+import { isValidInviteCodeFormat } from './invite-code';
 
 describe('isValidInviteCodeFormat', () => {
   it('accepts a well-formed code', () => {
