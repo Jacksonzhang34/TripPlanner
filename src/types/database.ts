@@ -55,12 +55,104 @@ export type Database = {
         }
         Relationships: []
       }
+      trip_members: {
+        Row: {
+          created_at: string
+          role: string
+          trip_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          role: string
+          trip_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          role?: string
+          trip_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_members_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trips: {
+        Row: {
+          capacity: number | null
+          cover_photo_url: string | null
+          created_at: string
+          created_by: string
+          destination: string | null
+          end_date: string | null
+          id: string
+          invite_code: string | null
+          invite_expires_at: string | null
+          invite_role: string | null
+          name: string
+          start_date: string | null
+          status: string
+        }
+        Insert: {
+          capacity?: number | null
+          cover_photo_url?: string | null
+          created_at?: string
+          created_by: string
+          destination?: string | null
+          end_date?: string | null
+          id?: string
+          invite_code?: string | null
+          invite_expires_at?: string | null
+          invite_role?: string | null
+          name: string
+          start_date?: string | null
+          status?: string
+        }
+        Update: {
+          capacity?: number | null
+          cover_photo_url?: string | null
+          created_at?: string
+          created_by?: string
+          destination?: string | null
+          end_date?: string | null
+          id?: string
+          invite_code?: string | null
+          invite_expires_at?: string | null
+          invite_role?: string | null
+          name?: string
+          start_date?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_trip_member: {
+        Args: { p_trip_id: string; p_uid: string }
+        Returns: boolean
+      }
+      redeem_invite: {
+        Args: { p_code: string }
+        Returns: {
+          role: string
+          trip_id: string
+        }[]
+      }
+      transfer_trip_ownership: {
+        Args: { p_new_owner_id: string; p_trip_id: string }
+        Returns: undefined
+      }
+      trip_role: { Args: { p_trip_id: string; p_uid: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
