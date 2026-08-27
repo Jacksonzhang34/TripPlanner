@@ -1,5 +1,5 @@
 begin;
-select plan(17);
+select plan(18);
 
 insert into auth.users (id, email) values
   ('11111111-1111-1111-1111-111111111111', 'owner@example.com'),
@@ -27,6 +27,22 @@ select is(
   (select count(*)::int from public.trips where id = '33333333-3333-3333-3333-333333333333'),
   1,
   '[ownership] owner can see their own trip'
+);
+
+-- Regression test: the app (PostgREST via `.select().single()`) does
+-- `INSERT ... RETURNING`, not a separate INSERT then SELECT like the
+-- fixture above. RETURNING is subject to the SELECT policy on the row it
+-- just inserted, and `is_trip_member()` is `stable` — stable functions
+-- can't see writes made earlier within the SAME command, including this
+-- INSERT's own `on_trip_created` trigger. Without the `created_by =
+-- auth.uid()` clause on the SELECT policy, this exact statement shape
+-- fails with "new row violates row-level security policy" and the whole
+-- INSERT rolls back — no trip is ever created, for anyone. The two
+-- assertions above never caught this because they insert and select in
+-- separate statements, which sidesteps the bug entirely.
+select lives_ok(
+  $$insert into public.trips (id, name, created_by) values ('44444444-4444-4444-4444-444444444444', 'RETURNING Regression Trip', '11111111-1111-1111-1111-111111111111') returning *$$,
+  '[ownership] creating a trip via INSERT...RETURNING (what the app actually does) succeeds'
 );
 
 -- ===================================================================
